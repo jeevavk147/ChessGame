@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
+import { MoveChange } from 'ngx-chess-board';
 import { Observable, Subject } from 'rxjs';
-import { json } from 'stream/consumers';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -13,7 +14,6 @@ export class WebSocketServiceService {
   connect(url:string)
   {
     this.ws=new WebSocket(url);
-
     this.ws.onmessage=(event)=>{
       this.move.next(event.data)
     }
@@ -22,10 +22,9 @@ export class WebSocketServiceService {
   sendmove(move)
   {
     this.ws.send(JSON.stringify(move))
-    console.log(JSON.stringify(move))
   }
 
-  getmove():Observable<any>
+  getmove():Observable<MoveChange["move"]>
   {
     return this.move.asObservable()
   }

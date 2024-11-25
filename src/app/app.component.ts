@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component,  HostListener, OnInit, ViewChild } from '@angular/core';
 import {
     MoveChange,
     NgxChessBoardComponent,
@@ -10,8 +10,8 @@ import {
 } from 'ngx-chess-board';
 import { FenComponent } from './components/fen/fen.component';
 import { WebSocketServiceService } from './web-socket-service.service';
-import { url } from 'inspector';
-//import {Auth} from 'aws-amplify'
+import { getCurrentUser, signOut } from 'aws-amplify/auth';
+import { HttpserviceService } from './httpservice.service';
 
 
 
@@ -21,17 +21,85 @@ import { url } from 'inspector';
     styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit{
-    constructor(private ws:WebSocketServiceService){}
+    constructor(private ws:WebSocketServiceService,private httpservice:HttpserviceService){}
+   
+    private usercolor:string|undefined=undefined;
+    private currentmove=''
+    private userId
+    private isplayerturn:boolean=false;
     private move;
-    private url="wss://fth52n7v67.execute-api.ap-south-1.amazonaws.com/chess/";
+    private wsurl="wss://fth52n7v67.execute-api.ap-south-1.amazonaws.com/chess/";
+    async  currentAuthenticatedUser() {
+        try {
+          const {  userId } = await getCurrentUser();
+          this.userId=userId
+            this.httpservice.createItem({userId:userId}).subscribe(
+                {
+                    next:()=>{
+                          this.httpservice.getitem(userId).subscribe((item)=>{
+                            this.usercolor=item.item.color
+                            if(this.usercolor=='WHITE')
+                                {
+                                  this.isplayerturn=true
+                                }
+                             if(item.item.color=="BLACK")
+                               {
+                                 console.log('called for reverse') 
+                                 this.boardManager.reverse()
+                                }  
+                          }) 
+                        
+                    }
+                }
+            ) 
+            
+                this.httpservice.getitem(userId).subscribe((item)=>{
+                  this.usercolor=item.item.color
+                  if(this.usercolor=='WHITE')
+                      {
+                        this.isplayerturn=true
+                      }
+                   if(item.item.color=="BLACK")
+                     {
+                       console.log('called for reverse') 
+                       this.boardManager.reverse()
+                      } 
+                }) 
+              
+        
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
     ngOnInit(): void {
-        this.ws.connect(this.url);
+        //Http
+        this.currentAuthenticatedUser()
+        //WebSocket 
+        this.ws.connect(this.wsurl);
         this.ws.getmove().subscribe((move)=> {
             this.move=move;
+            if(this.currentmove!=move)
+              { 
+                this.isplayerturn=true
+            }
+            console.log("web received: ",this.isplayerturn)
             this.boardManager.move(this.move);
-            console.log('web move: '+this.move);
+            
           })
     }
+
+    @HostListener('window:beforeunload',['$event'])
+    beforeunloadHandler(event:Event)
+    {
+        this.delete()
+    }
+   
+    delete(): void {
+        this.usercolor=null
+        this.httpservice.deleteitem(this.userId).subscribe()
+    }
+
     @ViewChild('board')
     boardManager: NgxChessBoardComponent;
 
@@ -93,10 +161,22 @@ export class AppComponent implements OnInit{
 
     public moveCallback(move: MoveChange): void 
     {
+        if(this.isplayerturn===false)
+            {
+                console.log("undo called")
+                this.boardManager.undo()
+            }
+             
         this.fen = this.boardManager.getFEN();
         this.pgn = this.boardManager.getPGN();     
-        this.ws.sendmove({"action":"sendmove","data":move.move})
-        console.log(move);
+        this.currentmove=move.move
+        if((this.usercolor=="WHITE"&&move.color=="white")||(this.usercolor=="BLACK"&&move.color=="black"))
+           {
+            this.ws.sendmove({"action":"sendmove","data":move.move})
+             this.isplayerturn=false
+           console.log("playerturn from movecallback: ",this.isplayerturn)
+           console.log(this.usercolor,typeof this.usercolor,typeof move.color);
+           }         
     }
 
     public moveManual(): void {
@@ -186,3 +266,5 @@ export class AppComponent implements OnInit{
 
     }
 }
+
+
