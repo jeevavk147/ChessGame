@@ -11,11 +11,12 @@ import {Amplify} from 'aws-amplify';
 import awsmobile from 'src/aws-exports'
 import {AmplifyAuthenticatorModule} from '@aws-amplify/ui-angular'
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
+import { MainComponent } from './main/main.component';
 Amplify.configure(awsmobile);
 
 @NgModule({
     declarations: [AppComponent, ActionsComponent, MovesComponent, FenComponent],
-    imports: [BrowserModule, FormsModule, NgxChessBoardModule,AmplifyAuthenticatorModule,HttpClientModule],
+    imports: [BrowserModule, FormsModule, NgxChessBoardModule, HttpClientModule, AmplifyAuthenticatorModule, MainComponent],
     bootstrap: [AppComponent],
     providers: [ provideHttpClient()]
 })
