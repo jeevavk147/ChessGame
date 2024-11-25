@@ -1,8 +1,8 @@
-<amplify-authenticator>
+<amplify-authenticator (authStateChange)="onAuthStateChange($event)">
     <ng-template amplifySlot="authenticated"
     let-user="user"
     let-signOut="signOut">
-        <button style="margin-left: 85%;"  (click)="signOut()">SignOut</button>
+        <button style="margin-left: 85%;"  (click)="handleSignOut()" >SignOut</button>
         <div style="width:400px; margin-left: auto; margin-right: auto; padding-bottom: 100px;max-width: 100%">
             <h2 style="text-align: center">Welcome {{user.username}}!!</h2>
             <ngx-chess-board #board [size]="size" [lightTileColor]="lightTileColor" 

@@ -12,7 +12,7 @@ import { FenComponent } from './components/fen/fen.component';
 import { WebSocketServiceService } from './web-socket-service.service';
 import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import { HttpserviceService } from './httpservice.service';
-
+import { Hub } from 'aws-amplify/utils';
 
 
 @Component({
@@ -26,11 +26,11 @@ export class AppComponent implements OnInit{
     private usercolor:string|undefined=undefined;
     private currentmove=''
     private userId
+    private usercount
     private isplayerturn:boolean=false;
     private move;
     private wsurl="wss://fth52n7v67.execute-api.ap-south-1.amazonaws.com/chess/";
     async  currentAuthenticatedUser() {
-        try {
           const {  userId } = await getCurrentUser();
           this.userId=userId
             this.httpservice.createItem({userId:userId}).subscribe(
@@ -38,6 +38,7 @@ export class AppComponent implements OnInit{
                     next:()=>{
                           this.httpservice.getitem(userId).subscribe((item)=>{
                             this.usercolor=item.item.color
+                            console.log(this.usercolor,typeof this.usercolor)
                             if(this.usercolor=='WHITE')
                                 {
                                   this.isplayerturn=true
@@ -47,14 +48,13 @@ export class AppComponent implements OnInit{
                                  console.log('called for reverse') 
                                  this.boardManager.reverse()
                                 }  
-                          }) 
-                        
+                          })  
                     }
-                }
-            ) 
+                }) 
             
                 this.httpservice.getitem(userId).subscribe((item)=>{
                   this.usercolor=item.item.color
+                  console.log(this.usercolor,typeof this.usercolor)
                   if(this.usercolor=='WHITE')
                       {
                         this.isplayerturn=true
@@ -64,40 +64,59 @@ export class AppComponent implements OnInit{
                        console.log('called for reverse') 
                        this.boardManager.reverse()
                       } 
-                }) 
-              
-        
-        } catch (err) {
-          console.log(err);
-        }
-      }
+                })
 
-    ngOnInit(): void {
+         
+          //auth event
+        Hub.listen('auth', ({ payload }) => {
+            switch (payload.event) {
+              case 'signedIn':
+                this.currentAuthenticatedUser()
+                break;
+              case 'signedOut':
+                console.log('user have been signedOut successfully.');
+                break;
+            }
+          });
+      }
+      async  handleSignOut() {
+        try {
+          await signOut();
+        } catch (error) {
+          console.log('error signing out: ', error);
+        }
+      }  
+        ngOnInit(): void  {
         //Http
         this.currentAuthenticatedUser()
         //WebSocket 
         this.ws.connect(this.wsurl);
         this.ws.getmove().subscribe((move)=> {
             this.move=move;
-            if(this.currentmove!=move)
+            if(this.currentmove!=move && this.usercolor!='WHITE'||'BLACK')
               { 
                 this.isplayerturn=true
             }
-            console.log("web received: ",this.isplayerturn)
             this.boardManager.move(this.move);
             
           })
     }
+
 
     @HostListener('window:beforeunload',['$event'])
     beforeunloadHandler(event:Event)
     {
         this.delete()
     }
-   
+    onAuthStateChange(event:any)
+    {
+        if(event.state==='signedin')
+        {
+            console.log("auth called")
+        }
+    }
     delete(): void {
-        this.usercolor=null
-        this.httpservice.deleteitem(this.userId).subscribe()
+               this.httpservice.deleteitem(this.userId).subscribe()
     }
 
     @ViewChild('board')
@@ -161,7 +180,7 @@ export class AppComponent implements OnInit{
 
     public moveCallback(move: MoveChange): void 
     {
-        if(this.isplayerturn===false)
+        if(this.isplayerturn==false)
             {
                 console.log("undo called")
                 this.boardManager.undo()
@@ -261,10 +280,6 @@ export class AppComponent implements OnInit{
         alert(this.boardManager.getPGN());
     }
 
-    async signout()
-    {
-
-    }
 }
 
 

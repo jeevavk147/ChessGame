@@ -14,7 +14,7 @@ import { HttpClientModule, provideHttpClient } from '@angular/common/http';
 Amplify.configure(awsmobile);
 
 @NgModule({
-    declarations: [AppComponent, ActionsComponent, SettingsComponent, MovesComponent, FenComponent],
+    declarations: [AppComponent, ActionsComponent, MovesComponent, FenComponent],
     imports: [BrowserModule, FormsModule, NgxChessBoardModule,AmplifyAuthenticatorModule,HttpClientModule],
     bootstrap: [AppComponent],
     providers: [ provideHttpClient()]
