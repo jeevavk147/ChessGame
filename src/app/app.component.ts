@@ -1,4 +1,4 @@
-import { Component,  HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component,  HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
     MoveChange,
     NgxChessBoardComponent,
@@ -71,10 +71,10 @@ export class AppComponent implements OnInit{
         Hub.listen('auth', ({ payload }) => {
             switch (payload.event) {
               case 'signedIn':
-                this.currentAuthenticatedUser()
+                this.ngOnInit()
                 break;
               case 'signedOut':
-                console.log('user have been signedOut successfully.');
+                this.delete()
                 break;
             }
           });
@@ -89,6 +89,7 @@ export class AppComponent implements OnInit{
         ngOnInit(): void  {
         //Http
         this.currentAuthenticatedUser()
+
         //WebSocket 
         this.ws.connect(this.wsurl);
         this.ws.getmove().subscribe((move)=> {
@@ -101,10 +102,13 @@ export class AppComponent implements OnInit{
             
           })
     }
-
-
     @HostListener('window:beforeunload',['$event'])
     beforeunloadHandler(event:Event)
+    {
+        this.delete()
+    }
+    @HostListener('window:unload',['$event'])
+    unloadHandler(event:Event)
     {
         this.delete()
     }
