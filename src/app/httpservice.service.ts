@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -24,5 +24,11 @@ export class HttpserviceService
   deleteitem(userId:any):Observable<any>
   {
     return this.http.delete(`${this.apiUrl}/${userId}`)
+  }
+  private errorsubject=new BehaviorSubject<string>('')
+  error=this.errorsubject.asObservable()
+  errorcall(error)
+  {
+    this.errorsubject.next(error)
   }
 }

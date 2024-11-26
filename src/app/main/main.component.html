@@ -1,7 +1,6 @@
 
 <button style="margin-left: 85%;"  (click)="handleSignOut()" >SignOut</button>
 <div style="width:400px; margin-left: auto; margin-right: auto; padding-bottom: 100px;max-width: 100%">
-    <h2 style="text-align: center">Welcome to chess!!</h2>
     <ngx-chess-board #board [size]="size" [lightTileColor]="lightTileColor" 
                      (moveChange)="moveCallback($event)"
                      [dragDisabled]="dragDisabled"
@@ -42,18 +41,6 @@
     <br>
 
     <div style="display:flex;">
-        <button type="button" class="btn btn-primary"
-                style="margin-left:auto; margin-right: 10px" (click)="reset()">Reset
-        </button>
-
-        <button type="button" class="btn btn-warning"
-                style="margin-right: 10px" (click)="reverse()">Reverse
-        </button>
-
-        <button type="button" class="btn btn-info"
-                style="margin-right: 10px" (click)="undo()">Undo
-        </button>
-
         <button type="button" class="btn btn-success"
                 style="margin-right:auto" (click)="showMoveHistory()">Display moves
         </button>

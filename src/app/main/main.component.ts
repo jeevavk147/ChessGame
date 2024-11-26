@@ -22,8 +22,8 @@ export class MainComponent implements OnInit{
  
   private usercolor:string|undefined=undefined;
   private currentmove=''
+  private error
   private userId
-  private usercount
   private isplayerturn:boolean=false;
   private move;
   private wsurl="wss://fth52n7v67.execute-api.ap-south-1.amazonaws.com/chess/";
@@ -44,30 +44,22 @@ export class MainComponent implements OnInit{
                              {
                                console.log('called for reverse') 
                                this.boardManager.reverse()
-                              }  
+                              } 
+                              if(item.item.color=="OUT")
+                                {
+                                    this.error="User Pool is Full !!!"
+                                    this.httpservice.errorcall(this.error)
+                                  this.handleSignOut()
+                                 }    
                         })  
                   }
               }) 
           
-              this.httpservice.getitem(userId).subscribe((item)=>{
-                this.usercolor=item.item.color
-                console.log(this.usercolor,typeof this.usercolor)
-                if(this.usercolor=='WHITE')
-                    {
-                      this.isplayerturn=true
-                    }
-                 if(item.item.color=="BLACK")
-                   {
-                     console.log('called for reverse') 
-                     this.boardManager.reverse()
-                    } 
-              })
-     
         //auth event
-      Hub.listen('auth', ({ payload }) => {
+        Hub.listen('auth', ({ payload }) => {
           switch (payload.event) {
             case 'signedIn':
-              this.ngOnInit()
+              //this.ngOnInit()
               console.log('signed in')
               break;
             case 'signedOut':
@@ -83,6 +75,15 @@ export class MainComponent implements OnInit{
         console.log('error signing out: ', error);
       }
     }  
+
+    async checkuser()
+    {
+     await this.currentAuthenticatedUser()
+     if (this.usercolor !== 'WHITE' && this.usercolor !== 'BLACK') {
+        this.handleSignOut()
+        console.log('userpool is full')
+    }  
+   }
       ngOnInit(): void  {
       //Http
       this.currentAuthenticatedUser()
@@ -91,13 +92,14 @@ export class MainComponent implements OnInit{
       this.ws.connect(this.wsurl);
       this.ws.getmove().subscribe((move)=> {
           this.move=move;
-          if(this.currentmove!=move && this.usercolor!='WHITE'||'BLACK')
+          if(this.currentmove!=move )
             { 
               this.isplayerturn=true
           }
           this.boardManager.move(this.move);
           
         })
+        
   }
   @HostListener('window:beforeunload',['$event'])
   beforeunloadHandler(event:Event)
@@ -181,7 +183,7 @@ export class MainComponent implements OnInit{
 
   public moveCallback(move: MoveChange): void 
   {
-      if(this.isplayerturn==false)
+      if(this.isplayerturn===false)
           {
               console.log("undo called")
               this.boardManager.undo()
@@ -189,13 +191,11 @@ export class MainComponent implements OnInit{
            
       this.fen = this.boardManager.getFEN();
       this.pgn = this.boardManager.getPGN();     
-      this.currentmove=move.move
       if((this.usercolor=="WHITE"&&move.color=="white")||(this.usercolor=="BLACK"&&move.color=="black"))
          {
+          this.currentmove=move.move
           this.ws.sendmove({"action":"sendmove","data":move.move})
            this.isplayerturn=false
-         console.log("playerturn from movecallback: ",this.isplayerturn)
-         console.log(this.usercolor,typeof this.usercolor,typeof move.color);
          }         
   }
 

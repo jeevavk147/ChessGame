@@ -1,7 +1,9 @@
+<h1>{{error}}</h1>
 <amplify-authenticator>
     <ng-template amplifySlot="authenticated"
     let-user="user"
     let-signOut="signOut">
+    <h2 style="text-align: center">Welcome {{user.username}}!!</h2>
     <app-main></app-main>
 </ng-template>
 </amplify-authenticator>
