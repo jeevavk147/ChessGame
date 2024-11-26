@@ -1,5 +1,6 @@
-<h1>{{error}}</h1>
+<h1 style="text-align: center" *ngIf="error.length>0" >{{error}} </h1>
 <amplify-authenticator>
+    <h1 style="text-align: center">{{error}}</h1>
     <ng-template amplifySlot="authenticated"
     let-user="user"
     let-signOut="signOut">

@@ -49,7 +49,7 @@ export class MainComponent implements OnInit{
                                 {
                                     this.error="User Pool is Full !!!"
                                     this.httpservice.errorcall(this.error)
-                                  this.handleSignOut()
+                                    this.handleSignOut()
                                  }    
                         })  
                   }
@@ -74,16 +74,8 @@ export class MainComponent implements OnInit{
       } catch (error) {
         console.log('error signing out: ', error);
       }
-    }  
-
-    async checkuser()
-    {
-     await this.currentAuthenticatedUser()
-     if (this.usercolor !== 'WHITE' && this.usercolor !== 'BLACK') {
-        this.handleSignOut()
-        console.log('userpool is full')
-    }  
-   }
+    } 
+    
       ngOnInit(): void  {
       //Http
       this.currentAuthenticatedUser()
