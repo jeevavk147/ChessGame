@@ -104,8 +104,8 @@ export class MainComponent implements OnInit{
       this.delete()
   }
 
-  async delete(): void {
-            await this.httpservice.deleteitem(this.userId).subscribe()
+  delete(): void {
+            this.httpservice.deleteitem(this.userId).subscribe()
   }
 
   @ViewChild('board')
