@@ -93,13 +93,18 @@ export class MainComponent implements OnInit{
         })
         
   }
-  @HostListener('window:beforeunloadHandler',['$event'])
+  @HostListener('window:beforeunload',['$event'])
   beforeunloadHandler(event:Event)
   {
       this.delete()
   }
-  @HostListener('window:pagehide',['$event'])
+  @HostListener('window:unload',['$event'])
   unloadHandler(event:Event)
+  {
+      this.delete()
+  }
+  @HostListener('window:pagehide',['$event'])
+  pagehide(event:Event)
   {
       this.delete()
   }
