@@ -13,6 +13,9 @@ export class AppComponent implements OnInit{
     {
         this.http.error.subscribe((error)=>{
             this.error=error
+            if(error.length>0)
+             { alert(this.error)}
+            this.error=''
         })
     }
 

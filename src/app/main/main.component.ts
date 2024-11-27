@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { WebSocketServiceService } from '../web-socket-service.service';
 import { HttpserviceService } from '../httpservice.service';
 import { getCurrentUser, signOut } from 'aws-amplify/auth';
@@ -59,7 +59,6 @@ export class MainComponent implements OnInit{
         Hub.listen('auth', ({ payload }) => {
           switch (payload.event) {
             case 'signedIn':
-              //this.ngOnInit()
               console.log('signed in')
               break;
             case 'signedOut':
@@ -68,6 +67,7 @@ export class MainComponent implements OnInit{
           }
         });
     }
+   
     async  handleSignOut() {
       try {
         await signOut();
@@ -93,12 +93,7 @@ export class MainComponent implements OnInit{
         })
         
   }
-  @HostListener('window:beforeunload',['$event'])
-  beforeunloadHandler(event:Event)
-  {
-      this.delete()
-  }
-  @HostListener('window:unload',['$event'])
+  @HostListener('window:pagehide',['$event'])
   unloadHandler(event:Event)
   {
       this.delete()
