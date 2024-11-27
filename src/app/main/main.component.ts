@@ -108,6 +108,12 @@ export class MainComponent implements OnInit{
   {
       this.delete()
   }
+  @HostListener('document:visibilitychange',['$event'])
+  visibilitychange()
+  {
+    if(document.visibilityState==='hidden')
+      {this.delete()}
+  }
   delete(): void {
              this.httpservice.deleteitem(this.userId).subscribe()
   }
