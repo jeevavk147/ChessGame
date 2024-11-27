@@ -108,13 +108,6 @@ export class MainComponent implements OnInit{
   {
       this.delete()
   }
-  onAuthStateChange(event:any)
-  {
-      if(event.state==='signedin')
-      {
-          console.log("auth called")
-      }
-  }
   delete(): void {
              this.httpservice.deleteitem(this.userId).subscribe()
   }
