@@ -103,9 +103,13 @@ export class MainComponent implements OnInit{
   {
       this.delete()
   }
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> 9ffcf83d5612c5524c066efb440fde07b98f5382
   delete(): void {
-             this.httpservice.deleteitem(this.userId).subscribe()
+            this.httpservice.deleteitem(this.userId).subscribe()
   }
 
   @ViewChild('board')
