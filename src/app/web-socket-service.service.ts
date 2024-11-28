@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { signOut } from 'aws-amplify/auth';
 import { MoveChange } from 'ngx-chess-board';
 import { Observable, Subject } from 'rxjs';
 

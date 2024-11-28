@@ -20,7 +20,7 @@ import { AmplifyAuthenticatorModule } from '@aws-amplify/ui-angular';
 export class MainComponent implements OnInit{
   constructor(private ws:WebSocketServiceService,private httpservice:HttpserviceService){}
  
-  private usercolor:string|undefined=undefined;
+  public usercolor:string|undefined=undefined;
   private currentmove=''
   private error
   private userId
